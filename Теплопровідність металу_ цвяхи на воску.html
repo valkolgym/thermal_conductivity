@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Теплопровідність металу: цвяхи на воску</title>
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#f4f6f9; --card:#ffffff; --text:#1c2430; --muted:#5b6675; --border:#d5dbe3;
+  --accent:#d9480f; --ground:#c9b99a; --stand:#6b7685; --btn:#1c2430; --btnText:#fff;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12161c; --card:#1b212a; --text:#e8ecf1; --muted:#9aa6b6; --border:#2e3744;
+    --accent:#ff8a4c; --ground:#4a4030; --stand:#8793a4; --btn:#e8ecf1; --btnText:#12161c;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12161c; --card:#1b212a; --text:#e8ecf1; --muted:#9aa6b6; --border:#2e3744;
+  --accent:#ff8a4c; --ground:#4a4030; --stand:#8793a4; --btn:#e8ecf1; --btnText:#12161c;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+h1{font-size:clamp(1.2rem,3.5vw,1.7rem);margin:0 0 6px}
+p.lead{margin:0 0 14px;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:14px}
+svg{width:100%;height:auto;display:block}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{font:inherit;border:0;border-radius:10px;padding:10px 16px;background:var(--btn);color:var(--btnText);cursor:pointer;font-weight:600}
+button.sec{background:transparent;color:var(--text);border:1px solid var(--border)}
+label{display:flex;align-items:center;gap:8px;color:var(--muted);flex:1 1 220px}
+input[type=range]{flex:1;min-width:100px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.stat{border:1px solid var(--border);border-radius:10px;padding:10px}
+.stat b{display:block;font-size:.85rem;color:var(--muted);font-weight:500}
+.stat span{font-size:1.15rem;font-weight:700}
+.stat small{display:block;color:var(--muted)}
+.stat.fallen{border-color:var(--accent)}
+#log{margin:0;padding-left:18px;color:var(--muted);font-size:.95rem}
+.flame{transform-origin:center bottom;animation:fl .18s infinite alternate ease-in-out}
+@keyframes fl{from{transform:scale(1,.92) skewX(-2deg)}to{transform:scale(.95,1.06) skewX(2deg)}}
+.hidden{display:none}
+text{fill:var(--text);font-family:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Теплопровідність металу: цвяхи на воску</h1>
+  <p class="lead">Цвяхи прикріплені воском до металевого стержня. Правий кінець нагрівається пальником. Тепло поширюється вздовж стержня, віск плавиться, і цвяхи відпадають по черзі — від найближчого до полум’я.</p>
+
+  <div class="card">
+    <svg id="scene" viewBox="0 0 900 420" role="img" aria-label="Схема експерименту">
+      <defs>
+        <linearGradient id="fg" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stop-color="#2b6cff"/><stop offset=".35" stop-color="#ffb020"/><stop offset="1" stop-color="#ff5a1f"/>
+        </linearGradient>
+      </defs>
+      <!-- ground -->
+      <rect x="0" y="392" width="900" height="28" fill="var(--ground)"/>
+      <!-- stand -->
+      <rect x="30" y="380" width="110" height="12" rx="3" fill="var(--stand)"/>
+      <rect x="76" y="90" width="12" height="292" fill="var(--stand)"/>
+      <rect x="76" y="148" width="86" height="12" rx="3" fill="var(--stand)"/>
+      <rect x="112" y="136" width="34" height="48" rx="6" fill="var(--stand)"/>
+      <text x="40" y="76" font-size="15">Штатив</text>
+      <!-- rod cells -->
+      <g id="rod"></g>
+      <rect id="rodOutline" x="140" y="160" width="620" height="16" rx="3" fill="none" stroke="var(--text)" stroke-opacity=".35"/>
+      <text x="400" y="140" font-size="15" text-anchor="middle">Металевий стержень</text>
+      <!-- nails -->
+      <g id="nails"></g>
+      <!-- burner -->
+      <g id="burner">
+        <rect x="738" y="340" width="44" height="46" rx="6" fill="#5b6675"/>
+        <rect x="753" y="318" width="14" height="24" fill="#8793a4"/>
+        <g class="flame" id="flame">
+          <path d="M760 318 C738 292 750 276 758 250 C762 266 782 280 776 298 C774 306 768 312 760 318Z" fill="url(#fg)"/>
+          <path d="M760 316 C751 302 757 294 760 282 C765 292 771 300 760 316Z" fill="#fff3b0" opacity=".9"/>
+        </g>
+        <text x="760" y="410" font-size="14" text-anchor="middle" fill="var(--text)">Пальник</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="card controls">
+    <button id="startBtn">▶ Почати нагрівання</button>
+    <button id="resetBtn" class="sec">↺ Спочатку</button>
+    <label>Швидкість ×<span id="spdVal">1</span>
+      <input id="spd" type="range" min="1" max="8" step="0.5" value="1"></label>
+    <span id="clock" style="font-weight:700">0 с</span>
+  </div>
+
+  <div class="card">
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="card">
+    <strong>Хід досліду</strong>
+    <ol id="log"><li>Пальник вимкнено. Натисніть «Почати нагрівання».</li></ol>
+  </div>
+</div>
+
+<script>
+(function(){
+  var N = 60, X0 = 140, X1 = 760, DX = (X1 - X0) / N;
+  var T_AMB = 20, T_FLAME = 600, T_MELT = 60, R = 0.4, STEPS_PER_SEC = 45;
+  var NS = "http://www.w3.org/2000/svg";
+  var rod = document.getElementById("rod");
+  var nailsG = document.getElementById("nails");
+  var flame = document.getElementById("flame");
+  var stats = document.getElementById("stats");
+  var logEl = document.getElementById("log");
+
+  var cells = [], T = [], nails = [];
+  var running = false, acc = 0, simTime = 0, last = 0, fallen = 0;
+  var cellIdx = [14, 26, 38, 50];
+
+  function el(name, attrs, parent){
+    var e = document.createElementNS(NS, name);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+
+  function tempColor(t){
+    var f = Math.max(0, Math.min(1, (t - T_AMB) / 300));
+    var r = Math.round(150 + 105 * f);
+    var g = Math.round(160 - 90 * f * (f > .5 ? 1.2 : .6));
+    var b = Math.round(172 - 150 * f);
+    return "rgb(" + r + "," + Math.max(g, 30) + "," + Math.max(b, 20) + ")";
+  }
+
+  function build(){
+    rod.innerHTML = ""; nailsG.innerHTML = ""; stats.innerHTML = "";
+    cells = []; T = []; nails = [];
+    for (var i = 0; i < N; i++){
+      T.push(T_AMB);
+      cells.push(el("rect", {x: X0 + i * DX, y: 160, width: DX + .6, height: 16, fill: tempColor(T_AMB)}, rod));
+    }
+    cellIdx.forEach(function(c, n){
+      var x = X0 + (c + .5) * DX;
+      var g = el("g", {}, nailsG);
+      var wax = el("ellipse", {cx: x, cy: 178, rx: 9, ry: 5, fill: "#f5e6a8", stroke: "#c9b36a", "stroke-width": 1}, nailsG);
+      var nail = el("g", {}, nailsG);
+      el("line", {x1: 0, y1: 0, x2: 0, y2: 42, stroke: "#8b929c", "stroke-width": 3.5, "stroke-linecap": "round"}, nail);
+      el("rect", {x: -6, y: -3, width: 12, height: 4, rx: 1.5, fill: "#6d747e"}, nail);
+      el("text", {x: x, y: 252, "text-anchor": "middle", "font-size": 14}, nailsG).textContent = "№" + (n + 1);
+      var s = document.createElement("div");
+      s.className = "stat";
+      s.innerHTML = "<b>Цвях №" + (n + 1) + (n === cellIdx.length - 1 ? " (найближчий до полум’я)" : "") + "</b><span>" + T_AMB + " °C</span><small>кріпиться</small>";
+      stats.appendChild(s);
+      nails.push({cell: c, x: x, y: 182, vy: 0, rot: 0, state: "attached", melt: 0, wax: wax, g: nail, box: s, label: g, time: null});
+    });
+    nails.forEach(place);
+    nailsG.querySelectorAll("text").forEach(function(t){ t.style.display = "block"; });
+    fallen = 0; simTime = 0; acc = 0;
+    flame.classList.add("hidden");
+    document.getElementById("clock").textContent = "0 с";
+    logEl.innerHTML = "<li>Пальник вимкнено. Натисніть «Почати нагрівання».</li>";
+  }
+
+  function place(n){
+    n.g.setAttribute("transform", "translate(" + n.x + "," + n.y + ") rotate(" + n.rot + ")");
+  }
+
+  function addLog(txt){
+    var li = document.createElement("li");
+    li.textContent = txt;
+    logEl.appendChild(li);
+  }
+
+  function step(){
+    var nT = T.slice();
+    for (var i = 0; i < N - 1; i++){
+      var l = i > 0 ? T[i - 1] : T[0];
+      nT[i] = T[i] + R * (l - 2 * T[i] + T[i + 1]) - 0.0006 * (T[i] - T_AMB);
+    }
+    nT[N - 1] = T_FLAME;
+    T = nT;
+  }
+
+  function frame(ts){
+    var dt = Math.min(0.05, (ts - last) / 1000 || 0);
+    last = ts;
+    var spd = parseFloat(document.getElementById("spd").value);
+    if (running){
+      simTime += dt * spd;
+      acc += STEPS_PER_SEC * spd * dt;
+      while (acc >= 1){ step(); acc -= 1; }
+    }
+    for (var i = 0; i < N; i++) cells[i].setAttribute("fill", tempColor(T[i]));
+
+    nails.forEach(function(n, idx){
+      var temp = T[n.cell];
+      if (n.state === "attached" && temp >= T_MELT){
+        n.state = "melting";
+        addLog("t = " + simTime.toFixed(0) + " с: віск під цвяхом №" + (idx + 1) + " плавиться (" + temp.toFixed(0) + " °C).");
+      }
+      if (n.state === "melting"){
+        n.melt += dt * spd;
+        var m = Math.min(1, n.melt / 1.2);
+        n.wax.setAttribute("ry", (5 * (1 - m * .6)).toFixed(2));
+        n.wax.setAttribute("fill-opacity", (1 - m * .5).toFixed(2));
+        if (n.melt >= 1.2){
+          n.state = "falling";
+          n.time = simTime;
+          n.box.classList.add("fallen");
+          addLog("t = " + simTime.toFixed(0) + " с: цвях №" + (idx + 1) + " відпав.");
+        }
+      }
+      if (n.state === "falling"){
+        n.vy += 900 * dt * spd * 0.6;
+        n.y += n.vy * dt * spd;
+        n.rot = Math.min(12, n.rot + 20 * dt * spd);
+        if (n.y >= 388){
+          n.y = 388; n.state = "landed"; n.rot = 90 - idx * 4;
+          fallen++;
+          if (fallen === nails.length){
+            addLog("Усі цвяхи відпали: тепло поступово дійшло від полум’я до всіх точок стержня.");
+          }
+        }
+        n.wax.setAttribute("cy", 182 + Math.min(10, (n.y - 182) * .2));
+      }
+      place(n);
+      var st = n.state === "attached" ? "кріпиться" : n.state === "melting" ? "віск плавиться…" :
+               "відпав на t = " + (n.time || 0).toFixed(0) + " с";
+      var sp = n.box.querySelector("span"), sm = n.box.querySelector("small");
+      sp.textContent = temp.toFixed(0) + " °C";
+      sm.textContent = st;
+    });
+    document.getElementById("clock").textContent = Math.round(simTime) + " с";
+    requestAnimationFrame(frame);
+  }
+
+  document.getElementById("startBtn").addEventListener("click", function(){
+    running = !running;
+    this.textContent = running ? "⏸ Пауза" : "▶ Продовжити";
+    flame.classList.toggle("hidden", !running);
+    if (running && simTime === 0){
+      logEl.innerHTML = "";
+      addLog("Пальник увімкнено: правий кінець стержня нагрівається.");
+    }
+  });
+  document.getElementById("resetBtn").addEventListener("click", function(){
+    running = false;
+    document.getElementById("startBtn").textContent = "▶ Почати нагрівання";
+    build();
+  });
+  document.getElementById("spd").addEventListener("input", function(){
+    document.getElementById("spdVal").textContent = this.value;
+  });
+
+  build();
+  requestAnimationFrame(function(t){ last = t; frame(t); });
+})();
+</script>
+</body>
+</html>
